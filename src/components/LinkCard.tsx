@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import type { LinkItem } from '../types';
 import { Card } from './ui/card';
-import { ExternalLink, Trash2 } from 'lucide-react';
+import { ExternalLink, Trash2, QrCode } from 'lucide-react';
+import { QRModal } from './QRModal';
 
 interface LinkCardProps {
     link: LinkItem;
@@ -67,7 +68,11 @@ function FaviconWithFallback({ url, title }: { url: string; title: string }) {
 }
 
 export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
+    const [showQR, setShowQR] = useState(false);
+
     return (
+        <>
+        {showQR && <QRModal url={link.url} title={link.title} onClose={() => setShowQR(false)} />}
         <Card className="group relative overflow-hidden transition-all hover:shadow-md hover:-translate-y-1 bg-card border-border min-h-[80px] sm:min-h-[100px] flex items-center p-3 sm:p-5 rounded-2xl">
             <a
                 href={link.url}
@@ -90,7 +95,20 @@ export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
                 </div>
             </a>
 
-            {/* Delete button appears on hover in Desktop, but always available on Mobile via some interaction, or we make it visible but subtle */}
+            {/* QR 버튼 */}
+            <button
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowQR(true);
+                }}
+                className="p-2 sm:p-2.5 text-muted-foreground hover:text-primary hover:bg-muted rounded-full transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label="QR 코드 보기"
+            >
+                <QrCode className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+
+            {/* 삭제 버튼 */}
             <button
                 onClick={(e) => {
                     e.preventDefault();
@@ -109,5 +127,6 @@ export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
                 style={{ backgroundColor: primaryColor }}
             />
         </Card>
+        </>
     );
 }
