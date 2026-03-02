@@ -40,9 +40,6 @@ export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
                     <h3 className="font-semibold text-base sm:text-lg truncate group-hover:text-primary transition-colors" style={{ '--tw-text-opacity': 1, color: `var(--hover-color)` } as React.CSSProperties}>
                         {link.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground truncate opacity-80 mt-0.5">
-                        {link.url}
-                    </p>
                 </div>
 
                 <div className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-primary/10 transition-colors mr-2" style={{ color: primaryColor }}>
