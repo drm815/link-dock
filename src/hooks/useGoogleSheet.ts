@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import type { LinkItem } from '../types';
 
 const SCRIPT_URL_KEY = 'linkdock_script_url';
+const DEFAULT_SCRIPT_URL = import.meta.env.VITE_SCRIPT_URL ?? '';
 
 export function useGoogleSheet() {
     const [links, setLinks] = useState<LinkItem[]>([]);
     const [scriptUrl, setScriptUrl] = useState<string>(() =>
-        localStorage.getItem(SCRIPT_URL_KEY) ?? ''
+        localStorage.getItem(SCRIPT_URL_KEY) ?? DEFAULT_SCRIPT_URL
     );
     const [syncing, setSyncing] = useState(false);
     const [error, setError] = useState<string | null>(null);
