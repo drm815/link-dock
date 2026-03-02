@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { LinkItem } from '../types';
 import { Card } from './ui/card';
 import { ExternalLink, Trash2 } from 'lucide-react';
@@ -9,10 +9,56 @@ interface LinkCardProps {
     primaryColor: string; // Tailwind hex color for accents based on mode
 }
 
-export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
-    // Simple fallback favicon grabber from google s2
-    const faviconUrl = `https://www.google.com/s2/favicons?domain=${link.url}&sz=64`;
+// 도메인에서 일관된 색상을 생성하는 함수
+function getDomainColor(domain: string): string {
+    const colors = [
+        '#e74c3c', '#e67e22', '#f1c40f', '#2ecc71',
+        '#1abc9c', '#3498db', '#9b59b6', '#e91e63',
+        '#00bcd4', '#ff5722', '#607d8b', '#795548',
+    ];
+    let hash = 0;
+    for (let i = 0; i < domain.length; i++) {
+        hash = domain.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+}
 
+function FaviconWithFallback({ url, title }: { url: string; title: string }) {
+    const [failed, setFailed] = useState(false);
+
+    let domain = '';
+    try {
+        domain = new URL(url).hostname.replace('www.', '');
+    } catch {
+        domain = title;
+    }
+
+    const initial = (domain[0] ?? title[0] ?? '?').toUpperCase();
+    const bgColor = getDomainColor(domain);
+    const faviconUrl = `https://www.google.com/s2/favicons?domain=${url}&sz=64`;
+
+    if (failed) {
+        return (
+            <div
+                className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base select-none"
+                style={{ backgroundColor: bgColor }}
+            >
+                {initial}
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={faviconUrl}
+            alt="favicon"
+            className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+            onError={() => setFailed(true)}
+        />
+    );
+}
+
+export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
     return (
         <Card className="group relative overflow-hidden transition-all hover:shadow-md hover:-translate-y-1 bg-card border-border min-h-[80px] sm:min-h-[100px] flex items-center p-3 sm:p-5 rounded-2xl">
             <a
@@ -22,18 +68,7 @@ export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
                 className="flex-1 flex items-center gap-4 min-w-0"
             >
                 <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-xl flex items-center justify-center overflow-hidden">
-                    <img
-                        src={faviconUrl}
-                        alt="favicon"
-                        className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
-                        onError={(e) => {
-                            // Fallback to generic icon
-                            e.currentTarget.style.display = 'none';
-                            if (e.currentTarget.parentElement) {
-                                e.currentTarget.parentElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted-foreground"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
-                            }
-                        }}
-                    />
+                    <FaviconWithFallback url={link.url} title={link.title} />
                 </div>
 
                 <div className="flex-1 min-w-0">
