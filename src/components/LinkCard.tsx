@@ -54,6 +54,14 @@ function FaviconWithFallback({ url, title }: { url: string; title: string }) {
             alt="favicon"
             className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
             onError={() => setFailed(true)}
+            onLoad={(e) => {
+                // Google S2가 아이콘 없을 때 16x16 기본 아이콘을 반환함
+                // naturalWidth가 16 이하면 의미있는 아이콘이 없는 것으로 판단
+                const img = e.currentTarget;
+                if (img.naturalWidth <= 16 && img.naturalHeight <= 16) {
+                    setFailed(true);
+                }
+            }}
         />
     );
 }
