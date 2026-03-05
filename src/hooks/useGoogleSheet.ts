@@ -62,6 +62,21 @@ export function useGoogleSheet() {
         }
     }, [scriptUrl, links]);
 
+    const updateLink = useCallback(async (updated: LinkItem) => {
+        const prev = links;
+        // 낙관적 업데이트
+        setLinks((l) => l.map((item) => item.id === updated.id ? updated : item));
+        try {
+            await fetch(scriptUrl, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'update', link: updated }),
+            });
+        } catch {
+            setError('링크 수정에 실패했습니다.');
+            setLinks(prev);
+        }
+    }, [scriptUrl, links]);
+
     const saveScriptUrl = useCallback((url: string) => {
         const trimmed = url.trim();
         localStorage.setItem(SCRIPT_URL_KEY, trimmed);
@@ -78,6 +93,7 @@ export function useGoogleSheet() {
         saveScriptUrl,
         addLink,
         deleteLink,
+        updateLink,
         refetch: fetchLinks,
     };
 }

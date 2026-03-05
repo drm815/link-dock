@@ -1,12 +1,13 @@
 import React, { useState, useRef, useCallback } from 'react';
 import type { LinkItem } from '../types';
 import { Card } from './ui/card';
-import { ExternalLink, Trash2, QrCode } from 'lucide-react';
+import { ExternalLink, Trash2, QrCode, Pencil } from 'lucide-react';
 import { QRModal } from './QRModal';
 
 interface LinkCardProps {
     link: LinkItem;
     onDelete: (id: string) => void;
+    onEdit: (link: LinkItem) => void;
     primaryColor: string;
 }
 
@@ -65,7 +66,7 @@ function FaviconWithFallback({ url, title }: { url: string; title: string }) {
     );
 }
 
-export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
+export function LinkCard({ link, onDelete, onEdit, primaryColor }: LinkCardProps) {
     const [showQR, setShowQR] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [pressing, setPressing] = useState(false);
@@ -108,8 +109,8 @@ export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex flex-col gap-1">
-                            <p className="font-semibold">링크를 삭제할까요?</p>
-                            <p className="text-sm text-muted-foreground truncate">{link.title}</p>
+                            <p className="font-semibold truncate">{link.title}</p>
+                            <p className="text-sm text-muted-foreground truncate">{link.url}</p>
                         </div>
                         <div className="flex gap-2">
                             <button
@@ -117,6 +118,16 @@ export function LinkCard({ link, onDelete, primaryColor }: LinkCardProps) {
                                 className="flex-1 px-4 py-2 text-sm rounded-lg border border-border hover:bg-muted transition-colors"
                             >
                                 취소
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowDeleteConfirm(false);
+                                    onEdit(link);
+                                }}
+                                className="flex-1 px-4 py-2 text-sm rounded-lg border border-border hover:bg-muted transition-colors flex items-center justify-center gap-1.5"
+                            >
+                                <Pencil className="w-4 h-4" />
+                                수정
                             </button>
                             <button
                                 onClick={() => {

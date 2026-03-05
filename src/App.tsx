@@ -11,9 +11,10 @@ import { RefreshCw } from 'lucide-react'
 
 function AppContent() {
   const { mode } = useThemeContext()
-  const { links, syncing, error, isConfigured, scriptUrl, saveScriptUrl, addLink, deleteLink, refetch } = useGoogleSheet()
+  const { links, syncing, error, isConfigured, scriptUrl, saveScriptUrl, addLink, deleteLink, updateLink, refetch } = useGoogleSheet()
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [editingLink, setEditingLink] = useState<import('./types').LinkItem | null>(null)
 
   const handleAddLink = (title: string, url: string) => {
     const newLink: LinkItem = {
@@ -24,6 +25,16 @@ function AppContent() {
       createdAt: Date.now(),
     }
     addLink(newLink)
+  }
+
+  const handleEditLink = (link: LinkItem) => {
+    setEditingLink(link)
+    setIsAddModalOpen(true)
+  }
+
+  const handleModalClose = (open: boolean) => {
+    setIsAddModalOpen(open)
+    if (!open) setEditingLink(null)
   }
 
   const displayedLinks = links.filter((link) => {
@@ -65,6 +76,7 @@ function AppContent() {
                   key={link.id}
                   link={link}
                   onDelete={deleteLink}
+                  onEdit={handleEditLink}
                   primaryColor={primaryColor}
                 />
               ))}
@@ -107,8 +119,10 @@ function AppContent() {
 
       <AddLinkModal
         open={isAddModalOpen}
-        setOpen={setIsAddModalOpen}
+        setOpen={handleModalClose}
         onAdd={handleAddLink}
+        editLink={editingLink}
+        onEdit={updateLink}
       />
     </div>
   )

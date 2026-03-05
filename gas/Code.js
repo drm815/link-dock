@@ -26,6 +26,16 @@ function doPost(e) {
     for (let i = data.length - 1; i >= 1; i--) {
       if (data[i][0] === payload.id) { sheet.deleteRow(i + 1); break; }
     }
+  } else if (payload.action === 'update') {
+    const l = payload.link;
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === l.id) {
+        sheet.getRange(i + 1, 2).setValue(l.title);
+        sheet.getRange(i + 1, 3).setValue(l.url);
+        break;
+      }
+    }
   }
   return ContentService.createTextOutput('ok');
 }
